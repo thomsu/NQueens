@@ -8,7 +8,7 @@ var nQueens = function (size, position) {
         var row = position[1];
         this.board[row][col] = true;
 
-        this.createDiagonal = function(topleft, topright, bottomleft, bottomright) {
+        this.createDiagonal = function(topleft, topright, bottomleft, bottomright, checkList) {
             if (topleft[0] - 1 >= 0 && topleft[1] - 1 >= 0) {
                 var tlr = topleft[0] - 1;
                 var tlc = topleft[1] - 1;
@@ -41,7 +41,13 @@ var nQueens = function (size, position) {
             var colVerify = this.board.map(row => row[position[1]]).reduce((sum, num) => sum + num);
             if (rowVerify !== 0) return false;
             var checkList = [];
-
+            this.createDiagonal(position, position, position, position, checkList);
+            for (let i of [...Array(this.size-1).keys()]) {
+                this.createDiagonal(checkList[0], checkList[1], checkList[2], checkList[3], checkList);
+                if (checkList.some(corner => corner == null)) {
+                    return false;
+                }
+            } return true;
             }
         }
     }
