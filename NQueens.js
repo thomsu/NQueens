@@ -1,12 +1,12 @@
 var nQueens = function (size, position) {
-    var solution = [ position ];
+    var solution = [];
     function chessBoard (size, position) {
         this.size = size;
         this.board = [];
         [...Array(this.size).keys()].forEach(() => this.board.push(Array(size).fill(false)));
-        var col = position.charCodeAt(0) - 'a'.charCodeAt(0);
-        var row = position[1];
-        this.board[row][col] = true;
+        this.fixedCol = position.charCodeAt(0) - 'a'.charCodeAt(0);
+        this.fixedRow = parseInt(position[1]);
+        this.board[this.fixedCol][this.fixedRow] = true;
 
         this.createDiagonal = function(topleft, topright, bottomleft, bottomright, checkList) {
             if (topleft[0] - 1 >= 0 && topleft[1] - 1 >= 0) {
@@ -15,24 +15,28 @@ var nQueens = function (size, position) {
                 if (!this.board[tlr][tlc]) {
                     checkList.push([tlr, tlc]);
                 } else {checkList.push(null;}
+            }
             if (topright[0] - 1 >= 0 && topright[1] + 1 <= this.size) {
                 var trr = topright[0] - 1;
                 var trc = topright[1] + 1;
                 if (!this.board[trr][trc]) {
                     checkList.push([trr, trc]);
                 } else {checkList.push(null;}
+            }
             if (bottomleft[0] + 1 <= this.size && bottomleft[1] - 1 >= 0) {
                 var blr = bottomleft[0] + 1;
                 var blc = bottomleft[1] - 1;
                 if (!this.board[blr][blc]) {
                     checkList.push([blr, blc]);
                 } else {checkList.push(null;}
+            }
             if (bottomright[0] + 1 <= this.size && bottomright[1] + 1 <= this.size) {
                 var brr = bottomright[0] + 1;
                 var brc = bottomright[1] + 1;
                 if (!this.board[brr][brc]) {
                     checkList.push([brr, brc]);
                 } else {checkList.push(null;}
+            }
         }
 
         this.checkValid = function (position) {
@@ -49,7 +53,39 @@ var nQueens = function (size, position) {
                 }
             } return true;
             }
+
+        this.placeQueen = function (position) {
+            this.board[position[0]][position[1]] = true;
+        }
+
+        this.removeQueen = function (position) {
+            if (position[0] !== this.fixedCol && position[1] !== this.fixedRow) {
+                this.board[position[0]][position[1]] = false;
+                return true;
+            } else { return false; }
         }
     }
 
+    myBoard = new chessBoard(size, position);
+
+    function dfsFunction (row, skip, num) {
+        if (skip === row) {
+            return dfsFunction(row+1, skip, num);
+        }
+        for (let col = 0; i < size; col++) {
+            if (!myBoard.board[row][col] && myBoard.checkValid([row, col])) {
+                myBoard.placeQueen([row, col]);
+                solution.push([row, col])
+                result = dfsFunction(row+1, skip, num-1);
+                if (!result) {
+                    myBoard.removeQueen([row, col])
+                    solution.pop()
+                } else {return true};
+            }
+        }
+        return false;
+    }
+    dfsFunction (0, myBoard.fixedRow, size-1);
+
+    return solution;
 }
